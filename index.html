@@ -1097,7 +1097,7 @@ function seedFromPrev(p,prev){
 function openProject(pid){
   const p=state.projects.find(x=>x.id===pid);if(!p)return;const wk=weekKey();
   const existing=state.reports.find(r=>r.projectId===pid&&r.week===wk);
-  if(existing){cur=JSON.parse(JSON.stringify(existing));cur.date=cur.date||todayISO();if(!cur.checks)cur.checks=defChecks();if(!cur.miles)cur.miles=[];}
+  if(existing){cur=Object.assign(emptyReport(existing.mode||"genba"),JSON.parse(JSON.stringify(existing)));cur.date=cur.date||todayISO();if(!cur.checks||!cur.checks.length)cur.checks=defChecks();if(!Array.isArray(cur.miles))cur.miles=[];}
   else{cur=seedFromPrev(p,state.reports.find(r=>r.projectId===pid));}
   setMode(cur.mode);loadEditor();step=0;go("editor");showStep();
   document.getElementById("typeBox").style.display="none";document.getElementById("typeBoxP").style.display="none";
@@ -1474,7 +1474,7 @@ function addProp(){cur.props.push({name:"",status:""});renderProps();}
 function delProp(i){cur.props.splice(i,1);renderProps();}
 
 function renderPhotos(){
-  document.getElementById("photoGrid").innerHTML=cur.photos.map((p,i)=>`<div class="ph">
+  document.getElementById("photoGrid").innerHTML=(cur.photos||[]).map((p,i)=>`<div class="ph">
     <div class="imgwrap"><img src="${p.data}" alt=""><button class="rm" onclick="delPhoto(${i})" aria-label="削除">✕</button></div>
     <input class="cap" value="${esc(p.cap)}" placeholder="内容（例：南面 施工後）" oninput="cur.photos[${i}].cap=this.value"></div>`).join("")
     +`<button class="addph" onclick="document.getElementById('photoInput').click()"><span class="ic">＋</span>写真をとる／えらぶ</button>`;
